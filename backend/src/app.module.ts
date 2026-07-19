@@ -12,7 +12,6 @@ import { BranchesModule } from './branches/branches.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     PrismaModule,
     AuthModule,
     UsersModule,
