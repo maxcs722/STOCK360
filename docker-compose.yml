@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+
+  postgres:
+
+    image: postgres:17
+
+    container_name: stock360-db
+
+    restart: unless-stopped
+
+    environment:
+
+      POSTGRES_USER: stock360
+
+      POSTGRES_PASSWORD: stock360
+
+      POSTGRES_DB: stock360
+
+    ports:
+
+      - "5433:5432"
+
+    volumes:
+
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+
+  postgres_data:
