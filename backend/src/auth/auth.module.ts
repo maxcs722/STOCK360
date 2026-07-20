@@ -6,17 +6,20 @@ import { PrismaModule } from '../prisma/prisma.module';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
     PrismaModule,
 
-    PassportModule,
+    PassportModule.register({
+      defaultStrategy: 'jwt',
+    }),
 
     JwtModule.register({
       secret: process.env.JWT_SECRET!,
       signOptions: {
-        expiresIn: 900, // 15 minutos
+        expiresIn: '15m',
       },
     }),
   ],
@@ -27,11 +30,13 @@ import { AuthService } from './auth.service';
 
   providers: [
     AuthService,
+    JwtStrategy,
   ],
 
   exports: [
     AuthService,
     JwtModule,
+    PassportModule,
   ],
 })
 export class AuthModule {}
