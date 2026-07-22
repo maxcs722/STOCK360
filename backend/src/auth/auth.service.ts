@@ -22,6 +22,73 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    const users = await this.prisma.user.count();
+
+    // ==================================================
+    // INSTALACIÓN INICIAL (No existe ningún usuario)
+    // ==================================================
+    if (users === 0) {
+      let company = await this.prisma.company.findFirst({
+        orderBy: {
+          createdAt: 'asc',
+        },
+      });
+
+      if (!company) {
+        company = await this.prisma.company.create({
+          data: {
+            name: 'STOCK360',
+            fantasyName: 'STOCK360 ERP',
+            isActive: true,
+          },
+        });
+      }
+
+      const existingUser = await this.prisma.user.findUnique({
+        where: {
+          email: dto.email.toLowerCase(),
+        },
+      });
+
+      if (existingUser) {
+        throw new BadRequestException(
+          'El correo ya está registrado.',
+        );
+      }
+
+      const passwordHash = await bcrypt.hash(dto.password, 12);
+
+      const user = await this.prisma.user.create({
+        data: {
+          name: dto.name,
+          lastName: dto.lastName,
+          email: dto.email.toLowerCase(),
+          passwordHash,
+          role: UserRole.SUPER_ADMIN,
+          companyId: company.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          lastName: true,
+          email: true,
+          role: true,
+          companyId: true,
+          createdAt: true,
+        },
+      });
+
+      return {
+        message: 'Administrador inicial creado correctamente.',
+        company,
+        user,
+      };
+    }
+
+    // ==================================================
+    // REGISTRO NORMAL
+    // ==================================================
+
     const company = await this.prisma.company.findUnique({
       where: {
         id: dto.companyId,
@@ -103,6 +170,15 @@ export class AuthService {
         'Correo o contraseña incorrectos.',
       );
     }
+
+    await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        lastLogin: new Date(),
+      },
+    });
 
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
