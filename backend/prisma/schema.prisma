@@ -16,180 +16,181 @@ enum UserRole {
 }
 
 model Company {
-  id           String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name         String
-  fantasyName  String?
+  name        String
+  fantasyName String?
 
-  rut          String?  @unique
+  rut String? @unique
 
-  email        String?
-  phone        String?
+  email String?
+  phone String?
 
-  address      String?
-  city         String?
-  region       String?
+  address String?
+  city    String?
+  region  String?
 
-  website      String?
-  logo         String?
+  website String?
+  logo    String?
 
-  isActive     Boolean  @default(true)
+  isActive Boolean @default(true)
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  branches     Branch[]
-  users        User[]
-  products     Product[]
-  categories   Category[]
-  suppliers    Supplier[]
-  customers    Customer[]
+  branches   Branch[]
+  users      User[]
+  products   Product[]
+  categories Category[]
+  suppliers  Supplier[]
+  customers  Customer[]
 }
 
 model Branch {
-  id           String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name         String
+  name String
 
-  address      String?
-  city         String?
-  region       String?
+  address String?
+  city    String?
+  region  String?
 
-  phone        String?
-  email        String?
+  phone String?
+  email String?
 
-  manager      String?
+  manager String?
 
-  isActive     Boolean @default(true)
+  isActive Boolean @default(true)
 
-  companyId    String
-  company      Company @relation(fields: [companyId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {
-  id                 String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name               String
-  lastName           String?
+  name     String
+  lastName String?
 
-  email              String   @unique
+  email String @unique
 
-  passwordHash       String
-  refreshTokenHash   String?
+  passwordHash     String
+  refreshTokenHash String?
 
-  role               UserRole
+  role UserRole
 
-  avatar             String?
-  lastLogin          DateTime?
+  avatar    String?
+  lastLogin DateTime?
 
-  isActive           Boolean @default(true)
+  isActive Boolean @default(true)
 
-  companyId          String
-  company            Company @relation(fields: [companyId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Category {
-  id           String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  code         String?
-  name         String
-  description  String?
+  code        String?
+  name        String
+  description String?
 
-  isActive     Boolean @default(true)
+  isActive Boolean @default(true)
 
-  companyId    String
-  company      Company @relation(fields: [companyId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
-  products     Product[]
+  products Product[]
 }
 
 model Supplier {
-  id           String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name         String
-  contactName  String?
+  name        String
+  contactName String?
 
-  rut          String?
+  rut String?
 
-  phone        String?
-  email        String?
+  phone String?
+  email String?
 
-  address      String?
-  city         String?
-  region       String?
+  address String?
+  city    String?
+  region  String?
 
-  website      String?
+  website String?
 
-  isActive     Boolean @default(true)
+  isActive Boolean @default(true)
 
-  companyId    String
-  company      Company @relation(fields: [companyId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
-  products     Product[]
+  products Product[]
 }
 
 model Customer {
-  id           String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name         String
-  contactName  String?
+  name        String
+  contactName String?
 
-  rut          String?
+  rut String?
 
-  phone        String?
-  email        String?
+  phone String?
+  email String?
 
-  address      String?
-  city         String?
-  region       String?
+  address String?
+  city    String?
+  region  String?
 
-  isActive     Boolean @default(true)
+  isActive Boolean @default(true)
 
-  companyId    String
-  company      Company @relation(fields: [companyId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 }
 
 model Product {
-  id            String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  sku           String   @unique
-  barcode       String?  @unique
+  sku     String  @unique
+  barcode String? @unique
 
-  internalCode  String?
+  internalCode String?
 
-  name          String
+  name String
 
-  description   String?
+  description String?
 
-  brand         String?
-  model         String?
+  brand String?
+  model String?
 
-  unit          String   @default("UN")
+  unit String @default("UN")
 
-  cost          Decimal  @db.Decimal(12,2)
-  price         Decimal  @db.Decimal(12,2)
+  cost  Decimal @db.Decimal(12, 2)
+  price Decimal @db.Decimal(12, 2)
 
-  minStock      Int      @default(0)
+  stock    Int @default(0)
+  minStock Int @default(0)
 
-  imageUrl      String?
+  imageUrl String?
 
-  isActive      Boolean  @default(true)
+  isActive Boolean @default(true)
 
-  companyId     String
-  company       Company @relation(fields: [companyId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
-  categoryId    String
-  category      Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
 
-  supplierId    String?
-  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId String?
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
