@@ -1,5 +1,10 @@
-import { Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+} from '@nestjs/common';
 
+import { InstallDto } from './dto/install.dto';
 import { SetupService } from './setup.service';
 
 @Controller('setup')
@@ -9,7 +14,7 @@ export class SetupController {
   ) {}
 
   @Post('install')
-  install() {
-    return this.setupService.install();
+  install(@Body() dto: InstallDto) {
+    return this.setupService.install(dto);
   }
 }

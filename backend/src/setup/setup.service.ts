@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { UserRole } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { InstallDto } from './dto/install.dto';
 
 @Injectable()
 export class SetupService {
@@ -14,7 +15,7 @@ export class SetupService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async install() {
+  async install(dto: InstallDto) {
     const companyCount = await this.prisma.company.count();
     const userCount = await this.prisma.user.count();
 
@@ -24,44 +25,40 @@ export class SetupService {
       );
     }
 
-    const company = await this.prisma.company.create({
-      data: {
-        name: 'STOCK360',
-        fantasyName: 'STOCK360 ERP',
-        isActive: true,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const company = await tx.company.create({
+        data: {
+          name: dto.companyName,
+          fantasyName: dto.fantasyName,
+          isActive: true,
+        },
+      });
+
+      const passwordHash = await bcrypt.hash(dto.password, 12);
+
+      const user = await tx.user.create({
+        data: {
+          name: dto.adminName,
+          lastName: dto.adminLastName,
+          email: dto.adminEmail.toLowerCase(),
+          passwordHash,
+          role: UserRole.SUPER_ADMIN,
+          companyId: company.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          lastName: true,
+          email: true,
+          role: true,
+        },
+      });
+
+      return {
+        message: 'Sistema instalado correctamente.',
+        company,
+        user,
+      };
     });
-
-    const passwordHash = await bcrypt.hash(
-      'Admin123*',
-      12,
-    );
-
-    const user = await this.prisma.user.create({
-      data: {
-        name: 'Administrador',
-        lastName: 'Sistema',
-        email: 'admin@stock360.cl',
-        passwordHash,
-        role: UserRole.SUPER_ADMIN,
-        companyId: company.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-      },
-    });
-
-    return {
-      message: 'STOCK360 instalado correctamente.',
-      company,
-      user,
-      credentials: {
-        email: 'admin@stock360.cl',
-        password: 'Admin123*',
-      },
-    };
   }
 }
